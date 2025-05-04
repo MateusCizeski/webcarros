@@ -1,10 +1,13 @@
 import logoImg from '../../assets/logo.svg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container } from '../../container';
 import { Input } from '../../components/input';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { auth } from '../../services/firebaseConnection';
+import { createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { useEffect } from 'react';
 
 const schema = z.object({
   name: z.string().nonempty("O campo é obrigatório."),
@@ -16,10 +19,29 @@ type FormData = z.infer<typeof schema>
 
 export default function Register() {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema), mode: "onChange" });
+  const navigate = useNavigate();
 
-  function onSubmit(data: FormData) {
-    console.log(data);
+  async function onSubmit(data: FormData) {
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+    .then(async (user) => {
+      await updateProfile(user.user, {
+        displayName: data.name
+      });
+
+      navigate('/dashboard', { replace: true });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
+
+    useEffect(() => {
+      async function handleLogout() {
+        await signOut(auth);
+      }
+  
+      handleLogout();
+    }, []);
 
   return (
     <Container>
