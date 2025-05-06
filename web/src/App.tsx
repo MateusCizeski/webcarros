@@ -19,7 +19,7 @@ const router = createBrowserRouter([
       element: <CarDetail />
     } , {
       path: '/dashboard',
-      element: <Private><Dashboard /></Private>
+      element: /*<Private>*/<Dashboard /> /*</Private>*/
     } , {
       path: '/dashboard/new',
       element: <Private><New /></Private> 
