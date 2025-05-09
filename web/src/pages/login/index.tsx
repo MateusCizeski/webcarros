@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import logoImg from '../../assets/logo.svg';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container } from '../../container';
+import { Container } from '../../components/container';
 import { Input } from '../../components/input';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
