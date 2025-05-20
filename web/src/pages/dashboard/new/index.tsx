@@ -81,7 +81,7 @@ export default function New() {
       description: data.description,
       owner: user?.name,
       uid: user?.uid,
-      images: carImages,
+      images: carListImages,
     })
       .then(() => {
         reset();
