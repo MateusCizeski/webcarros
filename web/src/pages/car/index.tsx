@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Container } from "../../components/container";
 import { FaWhatsapp } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 interface CarProps {
   id: string;
@@ -30,6 +31,8 @@ interface CarImageProps {
 export default function CarDetail() {
   const { id } = useParams();
   const [car, setCar] = useState<CarProps>();
+  const [sliderPreview, setSliderPreview] = useState<number>(2);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadCar() {
@@ -37,6 +40,8 @@ export default function CarDetail() {
 
       const docRef = doc(db, "cars", id);
       getDoc(docRef).then((snapshot) => {
+        if (!snapshot.data()) navigate("/");
+
         setCar({
           id: snapshot.id,
           name: snapshot.data()?.name,
@@ -58,9 +63,41 @@ export default function CarDetail() {
     loadCar();
   }, [id]);
 
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth < 720) {
+        setSliderPreview(1);
+      } else {
+        setSliderPreview(2);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <Container>
-      <h1>slider</h1>
+      {car && (
+        <Swiper
+          slidesPerView={sliderPreview}
+          pagination={{ clickable: true }}
+          navigation
+        >
+          {car?.images.map((image) => (
+            <SwiperSlide>
+              <img
+                key={image.name}
+                src={image.url}
+                className="w-full h-96 object-cover"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
 
       {car && (
         <main className="w-full bg-white rounded-lg p-6 my-4">
@@ -99,7 +136,8 @@ export default function CarDetail() {
           <p>{car?.whatsapp}</p>
 
           <a
-            href=""
+            href={`https://api.whatsapp.com/send?phone=${car?.whatsapp}&text=Olá vo esse ${car?.name} e fiquei interessado`}
+            target="_blank"
             className="bg-green-500 w-full text-white flex items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-semibold cursor-pointer"
           >
             Conversar com o vendedor <FaWhatsapp size={26} color="#FFF" />
