@@ -1,36 +1,36 @@
-import { Container } from '../../../components/container';
-import { DashboardHeader } from '../../../components/panelHeader';
-import { useForm } from 'react-hook-form';
-import { Input } from '../../../components/input';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FiUpload, FiTrash } from 'react-icons/fi';
-import { ChangeEvent, useContext, useState } from 'react';
-import { AuthContext } from '../../../context/AuthContext';
-import { v4 as uuidV4 } from 'uuid';
-import { storage, db } from '../../../services/firebaseConnection';
+import { Container } from "../../../components/container";
+import { DashboardHeader } from "../../../components/panelHeader";
+import { useForm } from "react-hook-form";
+import { Input } from "../../../components/input";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FiUpload, FiTrash } from "react-icons/fi";
+import { ChangeEvent, useContext, useState } from "react";
+import { AuthContext } from "../../../context/AuthContext";
+import { v4 as uuidV4 } from "uuid";
+import { storage, db } from "../../../services/firebaseConnection";
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
-} from 'firebase/storage';
-import { addDoc, collection } from 'firebase/firestore';
+} from "firebase/storage";
+import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
-  name: z.string().nonempty('Este campo é obrigatório'),
-  model: z.string().nonempty('Este campo é obrigatório'),
-  year: z.string().nonempty('Este campo é obrigatório'),
-  km: z.string().nonempty('Este campo é obrigatório'),
-  price: z.string().nonempty('Este campo é obrigatório'),
-  city: z.string().nonempty('Este campo é obrigatório'),
+  name: z.string().nonempty("Este campo é obrigatório"),
+  model: z.string().nonempty("Este campo é obrigatório"),
+  year: z.string().nonempty("Este campo é obrigatório"),
+  km: z.string().nonempty("Este campo é obrigatório"),
+  price: z.string().nonempty("Este campo é obrigatório"),
+  city: z.string().nonempty("Este campo é obrigatório"),
   whatsapp: z
     .string()
-    .min(1, 'Este campo é obrigatório')
+    .min(1, "Este campo é obrigatório")
     .refine((value) => /^(\d{10, 11})$/.test(value), {
-      message: 'Número de telefne inválido',
+      message: "Número de telefne inválido",
     }),
-  description: z.string().nonempty('Este campo é obrigatório'),
+  description: z.string().nonempty("Este campo é obrigatório"),
 });
 
 interface ImageItemProps {
@@ -51,14 +51,14 @@ export default function New() {
     reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
 
   function onSubmit(data: FormData) {
     if (!carImages.length) {
-      alert('Envia agumas imagens para cadastrar');
+      alert("Envia agumas imagens para cadastrar");
       return;
     }
 
@@ -70,8 +70,8 @@ export default function New() {
       };
     });
 
-    addDoc(collection(db, 'cars'), {
-      name: data.name,
+    addDoc(collection(db, "cars"), {
+      name: data.name.toUpperCase(),
       model: data.model,
       year: data.year,
       km: data.km,
@@ -86,11 +86,11 @@ export default function New() {
       .then(() => {
         reset();
         setCarImages([]);
-        console.log('sucesso ao cadastrar.');
+        console.log("sucesso ao cadastrar.");
       })
       .catch((error) => {
         console.log(error);
-        console.log('erro ao cadastrar carro');
+        console.log("erro ao cadastrar carro");
       });
   }
 
@@ -98,10 +98,10 @@ export default function New() {
     if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
 
-      if (image.type === 'image/jpeg' || image.type === 'image/png') {
+      if (image.type === "image/jpeg" || image.type === "image/png") {
         handleUpload(image);
       } else {
-        alert('envie uma imagem JPEG ou PNG');
+        alert("envie uma imagem JPEG ou PNG");
         return;
       }
     }
@@ -136,7 +136,7 @@ export default function New() {
       await deleteObject(imageRef);
       setCarImages(carImages.filter((car) => car.url !== item.url));
     } catch (err) {
-      console.log('Erro ao deletar', err);
+      console.log("Erro ao deletar", err);
     }
   }
 
@@ -266,7 +266,7 @@ export default function New() {
             <p className="mb-2 font-medium">Descrição</p>
             <textarea
               className="border-2 w-full rounded-md h-24 px-2"
-              {...register('description')}
+              {...register("description")}
               name="description"
               id="description"
               placeholder="Digite a descrição completa sobre o carro..."

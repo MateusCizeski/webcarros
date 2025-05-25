@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Container } from '../../components/container';
-import { collection, query, getDocs, orderBy } from 'firebase/firestore';
-import { db } from '../../services/firebaseConnection';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Container } from "../../components/container";
+import { collection, query, getDocs, orderBy, where } from "firebase/firestore";
+import { db } from "../../services/firebaseConnection";
+import { Link } from "react-router-dom";
 
 interface CarsProps {
   id: string;
@@ -24,34 +24,70 @@ interface CarImageProps {
 export default function Home() {
   const [cars, setCars] = useState<CarsProps[]>([]);
   const [loadImges, setLoadImages] = useState<string[]>([]);
+  const [input, setInput] = useState("");
 
   useEffect(() => {
-    function loadCars() {
-      const carsRef = collection(db, 'cars');
-      const queryRef = query(carsRef, orderBy('created', 'desc'));
-
-      getDocs(queryRef).then((snapshot) => {
-        let listcars = [] as CarsProps[];
-
-        snapshot.forEach((doc) => {
-          listcars.push({
-            id: doc.id,
-            name: doc.data().name,
-            year: doc.data().year,
-            uid: doc.data().uid,
-            km: doc.data().km,
-            city: doc.data().city,
-            price: doc.data().price,
-            images: doc.data().images,
-          });
-        });
-
-        setCars(listcars);
-      });
-    }
-
     loadCars();
   }, []);
+
+  function loadCars() {
+    const carsRef = collection(db, "cars");
+    const queryRef = query(carsRef, orderBy("created", "desc"));
+
+    getDocs(queryRef).then((snapshot) => {
+      let listcars = [] as CarsProps[];
+
+      snapshot.forEach((doc) => {
+        listcars.push({
+          id: doc.id,
+          name: doc.data().name,
+          year: doc.data().year,
+          uid: doc.data().uid,
+          km: doc.data().km,
+          city: doc.data().city,
+          price: doc.data().price,
+          images: doc.data().images,
+        });
+      });
+
+      setCars(listcars);
+    });
+  }
+
+  async function handleSearchCar() {
+    if (input === "") {
+      loadCars();
+      return;
+    }
+
+    setCars([]);
+    setLoadImages([]);
+
+    const q = query(
+      collection(db, "cars"),
+      where("name", ">=", input.toUpperCase()),
+      where("name", "<=", input.toUpperCase() + "\uf8ff")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    let listcars = [] as CarsProps[];
+
+    querySnapshot.forEach((doc) => {
+      listcars.push({
+        id: doc.id,
+        name: doc.data().name,
+        year: doc.data().year,
+        uid: doc.data().uid,
+        km: doc.data().km,
+        city: doc.data().city,
+        price: doc.data().price,
+        images: doc.data().images,
+      });
+    });
+
+    setCars(listcars);
+  }
 
   function handleImageLoad(id: string) {
     setLoadImages((prevImagesLoaded) => [...prevImagesLoaded, id]);
@@ -63,9 +99,14 @@ export default function Home() {
         <input
           className="w-full border-2 rounded-lg h-9 px-3 outline-none"
           placeholder="Digite o nome do carro..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
         />
 
-        <button className="bg-red-500 h-9 px-8 rounded-lg text-white font-medium text-lg">
+        <button
+          className="bg-red-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
+          onClick={handleSearchCar}
+        >
           Buscar
         </button>
       </section>
@@ -81,13 +122,13 @@ export default function Home() {
               <div
                 className="w-full h-72 rounded-lg bg-slate-200"
                 style={{
-                  display: loadImges.includes(car.id) ? 'none' : 'block',
+                  display: loadImges.includes(car.id) ? "none" : "block",
                 }}
               ></div>
               <img
                 className="w-full rounded-lg mb-2 max-h-72 hover:scale-105 transition-all"
                 style={{
-                  display: loadImges.includes(car.id) ? 'block' : 'none',
+                  display: loadImges.includes(car.id) ? "block" : "none",
                 }}
                 src={car.images[0].url}
                 alt="carro"
