@@ -16,6 +16,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { addDoc, collection } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().nonempty("Este campo é obrigatório"),
@@ -58,7 +59,7 @@ export default function New() {
 
   function onSubmit(data: FormData) {
     if (!carImages.length) {
-      alert("Envia agumas imagens para cadastrar");
+      toast.error("Envie pelo menos 1 imagem");
       return;
     }
 
@@ -86,7 +87,7 @@ export default function New() {
       .then(() => {
         reset();
         setCarImages([]);
-        console.log("sucesso ao cadastrar.");
+        toast.success("Carro cadastrado com sucesso.");
       })
       .catch((error) => {
         console.log(error);
@@ -124,6 +125,7 @@ export default function New() {
         };
 
         setCarImages((images) => [...images, imageItem]);
+        toast.success("Imagem cadastrada com sucesso.");
       });
     });
   }

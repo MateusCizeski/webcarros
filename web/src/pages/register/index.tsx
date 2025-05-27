@@ -13,6 +13,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { AuthContext } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().nonempty("O campo é obrigatório."),
@@ -51,6 +52,7 @@ export default function Register() {
           uid: user.user.uid,
         });
 
+        toast.success("Bem vindo ao webCarros.");
         navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
