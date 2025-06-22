@@ -36,7 +36,6 @@ model Car {
   created     String
   price       Decimal
   owner       String
-  uid         String
   whatsapp    String
 
   userId      String
@@ -47,7 +46,6 @@ model Car {
 
 model CarImage {
   id     String @id @default(uuid())
-  uid    String
   name   String
   url    String
 
