@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../services/apiClient";
 
 interface AuthContextData {
-  user: UserProps | undefined;
+  user: UserProps | undefined | null;
   isAuthenticated: boolean;
   signIn: (credentials: SignInProps) => Promise<void>;
   signUp: (credentials: SignUpProps) => Promise<void>;
@@ -45,7 +45,7 @@ export function signOut() {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<UserProps>();
+  const [user, setUser] = useState<UserProps | undefined | null>();
   const isAuthenticated = !!user;
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function signUp({ name, email, password }: SignUpProps) {
     try {
       const navigate = useNavigate();
-      const response = await api.post("/users", {
+      await api.post("/users", {
         name,
         email,
         password,
