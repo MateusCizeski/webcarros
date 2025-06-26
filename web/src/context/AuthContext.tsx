@@ -1,62 +1,45 @@
-import { ReactNode, createContext, useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../services/firebaseConnection";
+import { createContext, ReactNode, useState, useEffect } from "react";
+import { destroyCookie, setCookie, parseCookies } from "nookies";
+import { useNavigate } from "react-router-dom";
+import { setupApiClient } from "../services/api";
 
-interface AuthProviderProps {
-  children: ReactNode;
+interface AuthContextData {
+  user: UserProps;
+  isAuthenticated: boolean;
+  signIn: (credentials: SignInProps) => Promise<void>;
+  signUp: (credentials: SignUpProps) => Promise<void>;
+  logoutUser: () => Promise<void>;
 }
-
-type AuthContextData = {
-  signed: boolean;
-  loadingAuth: boolean;
-  handleInfoUser: ({ name, email, uid }: UserProps) => void;
-  user: UserProps | null;
-};
 
 interface UserProps {
-  uid: string;
-  name: string | null;
-  email: string | null;
+  id: string;
+  name: string;
+  email: string;
 }
 
-export const AuthContext = createContext({} as AuthContextData);
+type AuthProviderProps = {
+  children: ReactNode;
+};
 
-function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<UserProps | null>(null);
-  const [loadingAuth, setLoadingAuth] = useState(true);
+interface SignInProps {
+  email: string;
+  password: string;
+}
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser({
-          uid: user.uid,
-          name: user?.displayName,
-          email: user?.email,
-        });
+interface SignUpProps {
+  name: string;
+  email: string;
+  password: string;
+}
 
-        setLoadingAuth(false);
-      } else {
-        setUser(null);
-        setLoadingAuth(false);
-      }
-    });
+export const authContext = createContext({} as AuthContextData);
 
-    return () => {
-      unsub();
-    };
-  }, []);
-
-  function handleInfoUser({ name, email, uid }: UserProps) {
-    setUser({ name, email, uid });
+export function signOut() {
+  const navigate = useNavigate();
+  try {
+    destroyCookie(null, "@cars.token", { path: "/" });
+    navigate("/login");
+  } catch (err) {
+    console.log("Erro ao sair");
   }
-
-  return (
-    <AuthContext.Provider
-      value={{ signed: !!user, loadingAuth, handleInfoUser, user }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
 }
-
-export default AuthProvider;
