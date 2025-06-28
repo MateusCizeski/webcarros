@@ -1,0 +1,67 @@
+﻿## Ignore arquivos de build
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+
+## Ignore arquivos de publish
+.publish/
+*.publish.xml
+
+## Ignore arquivos de usuário
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+## Visual Studio
+.vscode/
+.vs/
+*.code-workspace
+
+## Logs
+*.log
+
+## Pacotes
+*.nupkg
+*.snupkg
+packages/
+# se você estiver restaurando os pacotes no diretório de projeto
+project.lock.json
+project.fragment.lock.json
+
+## Arquivos do Rider
+.idea/
+
+## Arquivos de sistema
+*.DS_Store
+*.AppleDouble
+*.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## Arquivos de dependências
+node_modules/
+bower_components/
+
+## Testes
+TestResults/
+*.coverage
+*.coveragexml
+*.testresults
+
+## Arquivos de publicação do Visual Studio
+*.publishsettings
+
+## Arquivos do Azure
+*.azurePubxml
+*.azurePubxml.user
+
+## Arquivos de configuração temporários
+*.tmp
+*.temp
+
+# Ignore todos os appsettings, exceto o principal
+appsettings.json
